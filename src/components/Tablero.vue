@@ -18,10 +18,65 @@
       </div>
     </div>
     <div class="matriz">
-
+      <cuadro v-for="(item, index) in cuadros" :key="index" :style="'grid-row: ' + item.fila + '; grid-column:' + item.columna + ';'" />
     </div>
   </div>
 </template>
+
+<script>
+import Cuadro from './Cuadro.vue'
+
+export default {
+  components: { Cuadro },
+  data () {
+    return {
+      cuadros: [],
+      nivelPrincipiante: {
+        nivel: 1,
+        filas: 9,
+        columnas: 9,
+        minas: 10
+      },
+      nivelIntermedio: {
+        nivel: 2,
+        filas: 16,
+        columnas: 16,
+        minas: 40
+      },
+      nivelExperto: {
+        nivel: 3,
+        filas: 16,
+        columnas: 30,
+        minas: 99
+      },
+      nivelActual: null
+    }
+  },
+  created () {
+    this.nivelActual = this.nivelPrincipiante
+    this.iniciarNivel()
+  },
+  methods: {
+    iniciarNivel () {
+      let filas = this.nivelActual.filas
+      let columnas = this.nivelActual.columnas
+      let totalCuadros = filas * columnas
+
+      this.cuadros = []
+
+      for (let i = 0; i < totalCuadros; i++) {
+        let cuadro = {
+          fila: Math.floor(i / columnas) + 1,
+          columna: (i % columnas) + 1 
+        }
+
+        this.cuadros.push(cuadro)
+      }
+    }
+  }
+}
+</script>
+
 
 <style>
 
@@ -74,8 +129,6 @@
 .matriz {
   display: grid;
   background-color: #7b7b7b;
-  width: 400px;
-  height: 200px;
 }
 
 </style>
