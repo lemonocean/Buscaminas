@@ -31,6 +31,7 @@ export default {
   data () {
     return {
       cuadros: [],
+      colores: ['', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho'],
       nivelPrincipiante: {
         nivel: 1,
         filas: 9,
@@ -79,7 +80,9 @@ export default {
         let cuadro = {
           valor: '',
           fila: Math.floor(i / columnas) + 1,
-          columna: (i % columnas) + 1 
+          columna: (i % columnas) + 1,
+          vecinos: [],
+          claseValor: ''
         }
 
         this.cuadros.push(cuadro)
@@ -95,6 +98,84 @@ export default {
 
         indices.splice(posicion, 1)
       }
+
+      for (let i = 0; i < totalCuadros; i++) {
+        let cuadro = this.cuadros[i]
+
+        if (cuadro.columna == 1) {
+          if (cuadro.fila == 1) {
+            cuadro.vecinos.push(i + 1)
+            cuadro.vecinos.push(i + columnas)
+            cuadro.vecinos.push(i + columnas + 1)
+          }
+          else if (cuadro.fila == filas) {
+            cuadro.vecinos.push(i + 1)
+            cuadro.vecinos.push(i - columnas)
+            cuadro.vecinos.push(i - columnas + 1)
+          }
+          else {
+            cuadro.vecinos.push(i + 1)
+            cuadro.vecinos.push(i + columnas)
+            cuadro.vecinos.push(i + columnas + 1)
+            cuadro.vecinos.push(i - columnas)
+            cuadro.vecinos.push(i - columnas + 1)
+          }
+        }
+        else if (cuadro.columna == columnas) {
+          if (cuadro.fila == 1) {
+            cuadro.vecinos.push(i - 1)
+            cuadro.vecinos.push(i + columnas)
+            cuadro.vecinos.push(i + columnas - 1)
+          }
+          else if (cuadro.fila == filas) {
+            cuadro.vecinos.push(i - 1)
+            cuadro.vecinos.push(i - columnas)
+            cuadro.vecinos.push(i - columnas - 1)
+          }
+          else {
+            cuadro.vecinos.push(i - 1)
+            cuadro.vecinos.push(i + columnas)
+            cuadro.vecinos.push(i + columnas - 1)
+            cuadro.vecinos.push(i - columnas)
+            cuadro.vecinos.push(i - columnas - 1)
+          }
+        }
+        else {
+          if (cuadro.fila == 1) {
+            cuadro.vecinos.push(i - 1)
+            cuadro.vecinos.push(i + 1)
+            cuadro.vecinos.push(i + columnas - 1)
+            cuadro.vecinos.push(i + columnas)
+            cuadro.vecinos.push(i + columnas + 1)
+          }
+          else if (cuadro.fila == filas) {
+            cuadro.vecinos.push(i - 1)
+            cuadro.vecinos.push(i + 1)
+            cuadro.vecinos.push(i - columnas - 1)
+            cuadro.vecinos.push(i - columnas)
+            cuadro.vecinos.push(i - columnas + 1)
+          }
+          else {
+            cuadro.vecinos.push(i - 1)
+            cuadro.vecinos.push(i + 1)
+            cuadro.vecinos.push(i + columnas - 1)
+            cuadro.vecinos.push(i + columnas)
+            cuadro.vecinos.push(i + columnas + 1)
+            cuadro.vecinos.push(i - columnas - 1)
+            cuadro.vecinos.push(i - columnas)
+            cuadro.vecinos.push(i - columnas + 1)
+          }
+        }
+        
+        if (cuadro.valor != '💣') {
+          let minas = cuadro.vecinos.filter(v => this.cuadros[v].valor == '💣').length
+
+          if (minas > 0) {
+            cuadro.valor = minas
+            cuadro.claseValor = 'numero ' + this.colores[minas]
+          }
+        }
+      }
     }
   }
 }
@@ -107,6 +188,43 @@ export default {
 
 html {
   font-family: 'Roboto Mono', monospace;
+}
+
+.numero {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.uno {
+  color: blue;  
+}
+
+.dos {
+  color: green;
+}
+
+.tres {
+  color: red;
+}
+
+.cuatro {
+  color: darkblue;
+}
+
+.cinco {
+  color: brown;
+}
+
+.seis {
+  color: darkcyan;
+}
+
+.siete {
+  color: #9e3c9e;
+}
+
+.ocho {
+  color: #ffc400;
 }
 
 .tablero {

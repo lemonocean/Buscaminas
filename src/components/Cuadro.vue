@@ -1,6 +1,6 @@
 <template>
-  <div class="cuadro cuadro-inicial">
-    <span>{{ info.valor }}</span>
+  <div class="cuadro cuadro-vacio">
+    <span :class="info.claseValor">{{ info.valor }}</span>
   </div>
 </template>
 
@@ -30,6 +30,20 @@ export default {
   border-style: solid;
   border-width: 3px;
   cursor: pointer;
+}
+
+.cuadro-vacio {
+  width: 25px;
+  height: 25px;
+  background-color: #bdbdbd;
+  border-right-color: #7b7b7b;
+  border-bottom-color: #7b7b7b;
+  border-top-width: 0;
+  border-left-width: 0;
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+  border-style: solid;
+  cursor: default;
 }
 
 </style>
