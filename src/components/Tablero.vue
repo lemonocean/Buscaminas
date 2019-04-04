@@ -18,7 +18,7 @@
       </div>
     </div>
     <div class="matriz">
-      <cuadro :info="item" v-for="(item, index) in cuadros" :key="index" :style="'grid-row: ' + item.fila + '; grid-column:' + item.columna + ';'" />
+      <cuadro @onActivar="activarCuadro" :info="item" v-for="(item, index) in cuadros" :key="index" :style="'grid-row: ' + item.fila + '; grid-column:' + item.columna + ';'" />
     </div>
   </div>
 </template>
@@ -78,6 +78,8 @@ export default {
 
       for (let i = 0; i < totalCuadros; i++) {
         let cuadro = {
+          inicial: true,
+          bandera: false,
           valor: '',
           fila: Math.floor(i / columnas) + 1,
           columna: (i % columnas) + 1,
@@ -174,6 +176,20 @@ export default {
             cuadro.valor = minas
             cuadro.claseValor = 'numero ' + this.colores[minas]
           }
+        }
+      }
+    },
+    activarCuadro (cuadro) {
+      if (cuadro.inicial && !cuadro.bandera) {
+        cuadro.inicial = false
+
+        if (cuadro.valor == '💣') {
+          // Explosión
+        }
+        else if (cuadro.valor == '') {
+          cuadro.vecinos.forEach(v => {
+            this.activarCuadro(this.cuadros[v])
+          })
         }
       }
     }
@@ -294,6 +310,14 @@ html {
 .matriz {
   display: grid;
   background-color: #7b7b7b;
+  padding: 2px;
+  margin-top: 10px;
+  border-top-color: #878787;
+  border-left-color: #878787;
+  border-bottom-color: #fff;
+  border-right-color: #fff;
+  border-style: solid;
+  border-width: 3px;
 }
 
 </style>
