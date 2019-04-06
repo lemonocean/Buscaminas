@@ -34,6 +34,9 @@ export default {
           return ''
         }
       }
+      else if (this.info.valor == '❌') {
+        return 'bandera-falsa'
+      }
       else {
         return this.info.claseValor
       }
@@ -42,8 +45,7 @@ export default {
   methods: {
     bandera () {
       if (this.info.inicial) {
-        this.info.bandera = !this.info.bandera
-        this.$emit('onCambiarMinasRestantes', this.info.bandera ? -1 : 1)
+        this.$emit('onCambiarMinasRestantes', this.info)
       }
     },
     activar () {
@@ -58,6 +60,10 @@ export default {
 
 .bandera {
   font-size: 12px;
+}
+
+.bandera-falsa {
+  font-size: 18px;
 }
 
 .cuadro {
