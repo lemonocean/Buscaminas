@@ -18,7 +18,15 @@
       </div>
     </div>
     <div class="matriz">
-      <cuadro @onCambiarMinasRestantes="cambiarMinasRestantes" @onActivar="activarCuadro" :info="item" v-for="(item, index) in cuadros" :key="index" :style="'grid-row: ' + item.fila + '; grid-column:' + item.columna + ';'" />
+      <cuadro 
+        @mousedown.left.native="mouseDownLeft(cuadro)"
+        @mousedown.right.native="mouseDownRight(cuadro)"
+        @mouseup.left.native="mouseUpLeft(cuadro)"
+        @mouseup.right.native="mouseUpRight(cuadro)"
+        @mouseenter.native="mouseEnter(cuadro)"
+        @mouseleave.native="mouseLeave(cuadro)"
+        @contextmenu.prevent.native
+      :info="cuadro" v-for="(cuadro, index) in cuadros" :key="index" :style="'grid-row: ' + cuadro.fila + '; grid-column:' + cuadro.columna + ';'" />
     </div>
   </div>
 </template>
@@ -30,6 +38,8 @@ export default {
   components: { Cuadro },
   data () {
     return {
+      botonIzquierdo: false,
+      botonDerecho: false,
       cara: '🙂',
       cuadros: [],
       colores: ['', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho'],
@@ -92,6 +102,84 @@ export default {
     this.iniciarNivel()
   },
   methods: {
+    agregarSuspenso (cuadro) {
+      if (this.jugando) {
+        cuadro.suspenso = true
+
+        if (this.botonDerecho) {
+          cuadro.vecinos.forEach(v => {
+            if (!this.cuadros[v].bandera) {
+              this.cuadros[v].suspenso = true
+            }
+          })
+        }
+
+        this.cara = '😮'
+      }
+    },
+    quitarSuspenso (cuadro) {
+      if (this.jugando) {
+        cuadro.suspenso = false
+
+        cuadro.vecinos.forEach(v => {
+          this.cuadros[v].suspenso = false
+        })
+
+        this.cara = '🙂'
+      }
+    },
+    mouseDownLeft(cuadro) {
+      if (this.jugando) {
+        this.botonIzquierdo = true
+
+        this.agregarSuspenso(cuadro)
+      }
+    },
+    mouseDownRight(cuadro) {
+      if (this.jugando) {
+        this.botonDerecho = true
+
+        if (!this.botonIzquierdo) {
+          this.cambiarMinasRestantes(cuadro)
+        }
+        else {
+          this.agregarSuspenso(cuadro)
+        }
+      }
+    },
+    mouseUpLeft(cuadro) {
+      if (this.jugando) {
+        this.botonIzquierdo = false
+
+        if (cuadro.inicial) {
+          this.activarCuadro(cuadro)
+        }
+        else if (this.botonDerecho) {
+          this.despejarCuadro(cuadro)
+        }
+
+        this.quitarSuspenso(cuadro)
+      }
+    },
+    mouseUpRight(cuadro) {
+      if (this.jugando) {
+        this.botonDerecho = false
+
+        if (this.botonIzquierdo) {
+          this.despejarCuadro(cuadro)
+        }
+      }
+    },
+    mouseEnter(cuadro) {
+      if (this.jugando && this.botonIzquierdo) {
+        this.agregarSuspenso(cuadro)
+      }
+    },
+    mouseLeave(cuadro) {
+      if (this.jugando && cuadro.suspenso) {
+        this.quitarSuspenso(cuadro)
+      }
+    },
     detenerTiempo () {
       if (this.timer) {
         clearInterval(this.timer)
@@ -107,6 +195,8 @@ export default {
       this.iniciarNivel()
     },
     iniciarNivel () {
+      this.botonIzquierdo = false
+      this.botonDerecho = false
       this.cara = '🙂'
       this.detenerTiempo()
       this.minasRestantes = this.nivelActual.minas
@@ -124,6 +214,7 @@ export default {
 
       for (let i = 0; i < totalCuadros; i++) {
         let cuadro = {
+          suspenso: false,
           inicial: true,
           bandera: false,
           valor: '',
@@ -256,8 +347,19 @@ export default {
         }        
       }
     },
+    despejarCuadro (cuadro) {
+      if (!cuadro.inicial && cuadro.valor != '') {
+        let banderas = cuadro.vecinos.filter(v => this.cuadros[v].bandera).length
+
+        if (cuadro.valor == banderas) {
+          cuadro.vecinos.forEach(v => {
+            this.activarCuadro(this.cuadros[v])
+          })
+        }
+      }
+    },
     cambiarMinasRestantes (cuadro) {
-      if (this.jugando) {
+      if (this.jugando && cuadro.inicial) {
         cuadro.bandera = !cuadro.bandera
         this.minasRestantes += cuadro.bandera ? -1 : 1
       }
